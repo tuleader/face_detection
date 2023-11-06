@@ -18,32 +18,6 @@ def GetAgeCategory(age):
         return "Teenager"
     else:
         return "Adult"
-def show_custom_message(message):
-    # Tạo cửa sổ pop-up
-    custom_box = tk.Toplevel(root)
-    custom_box.title("Sau đây là gợi ý cho bạn")
-
-    # Tạo một Label để hiển thị nội dung thông báo
-    label = tk.Label(custom_box, text=message)
-    label.pack(padx=40, pady=20)
-
-    # Tạo một nút OK để đóng cửa sổ pop-up
-    ok_button = tk.Button(custom_box, text="OK", command=custom_box.destroy)
-    ok_button.pack(pady=10)
-
-    # Đặt cửa sổ pop-up ở vị trí chính giữa màn hình
-    window_width = 300
-    window_height = 100
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
-    x = (screen_width - window_width) // 2
-    y = (screen_height - window_height) // 2
-    custom_box.geometry(f"{window_width}x{window_height}+{x}+{y}")
-
-    custom_box.transient(root)  # Thiết lập cửa sổ con cho cửa sổ chính
-    custom_box.grab_set()  # Chặn tương tác với cửa sổ chính cho đến khi cửa sổ con được đóng
-
-    custom_box.mainloop()
 # Defining CreateWidgets() function to create necessary tkinter widgets
 def createwidgets():
     root.feedlabel = Label(root, bg="steelblue", fg="white", text="WEBCAM FEED", font=('Comic Sans MS',20))
@@ -247,7 +221,7 @@ def StartPredict():
     suggested_link = age_links[age_category]
     notification = f"Suggested link for {age_category}: {suggested_link}"
     print(notification)
-    show_custom_message(notification)
+    messagebox.showinfo(notification)
     webbrowser.open(suggested_link)
 
 
