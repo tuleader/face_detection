@@ -5,9 +5,45 @@ from PIL import Image,ImageTk
 from datetime import datetime
 from tkinter import messagebox, filedialog
 from face_detection import detect
+import webbrowser
+age_links = {
+    "Child": "https://web.facebook.com/tuta11.07",
+    "Teenager": "https://web.facebook.com/",
+    "Adult": "https://web.facebook.com/groups/864872477456083",
+}
+def GetAgeCategory(age):
+    if age < 18:
+        return "Child"
+    elif 18 <= age < 35:
+        return "Teenager"
+    else:
+        return "Adult"
+def show_custom_message(message):
+    # Tạo cửa sổ pop-up
+    custom_box = tk.Toplevel(root)
+    custom_box.title("Sau đây là gợi ý cho bạn")
 
+    # Tạo một Label để hiển thị nội dung thông báo
+    label = tk.Label(custom_box, text=message)
+    label.pack(padx=40, pady=20)
 
-# Defining CreateWidgets() function to create necessary tkinter widgets
+    # Tạo một nút OK để đóng cửa sổ pop-up
+    ok_button = tk.Button(custom_box, text="OK", command=custom_box.destroy)
+    ok_button.pack(pady=10)
+
+    # Đặt cửa sổ pop-up ở vị trí chính giữa màn hình
+    window_width = 300
+    window_height = 100
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = (screen_width - window_width) // 2
+    y = (screen_height - window_height) // 2
+    custom_box.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
+    custom_box.transient(root)  # Thiết lập cửa sổ con cho cửa sổ chính
+    custom_box.grab_set()  # Chặn tương tác với cửa sổ chính cho đến khi cửa sổ con được đóng
+
+    custom_box.mainloop()
 # Defining CreateWidgets() function to create necessary tkinter widgets
 def createwidgets():
     root.feedlabel = Label(root, bg="steelblue", fg="white", text="WEBCAM FEED", font=('Comic Sans MS',20))
@@ -62,7 +98,7 @@ def ShowFeed():
         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
         
-        canvas = detect(cv2image, frame)
+        canvas, predicted_age = detect(cv2image, frame)
         # Creating an image memory from the above frame exporting array interface
         videoImg = Image.fromarray(canvas)
 
@@ -96,7 +132,7 @@ def imageBrowse():
     # Presenting user with a pop-up for directory selection. initialdir argument is optional
     # Retrieving the user-input destination directory and storing it in destinationDirectory
     # Setting the initialdir argument is optional. SET IT TO YOUR DIRECTORY PATH
-    root.openDirectory = filedialog.askopenfilename(initialdir="YOUR DIRECTORY PATH")
+    root.openDirectory = filedialog.askopenfilename(initialdir="YOUR DIRECTORY PATH", filetypes=[("Image Files", "*.png;*.jpg")])
     
     # Displaying the directory in the directory textbox
     imagePath.set(root.openDirectory)
@@ -192,8 +228,11 @@ def StartPredict():
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
 
-    canvas = detect(rgb, gray)
-
+    canvas, predicted_age = detect(rgb, gray)
+    if predicted_age == 0:
+        print("Age category not found.")
+        messagebox.showerror("Age category not found.")
+        return 0
     predict_image = Image.fromarray(canvas)
     predict_image = predict_image.resize((250, 250), Image.Resampling.LANCZOS)
     # Creating object of PhotoImage() class to display the frame
@@ -204,12 +243,12 @@ def StartPredict():
 
     # Keeping a reference
     root.imageLabel.photo = predict_image
-
-
-
-
-
-
+    age_category = GetAgeCategory(predicted_age)
+    suggested_link = age_links[age_category]
+    notification = f"Suggested link for {age_category}: {suggested_link}"
+    print(notification)
+    show_custom_message(notification)
+    webbrowser.open(suggested_link)
 
 
 # Creating object of tk class

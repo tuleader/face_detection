@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow import keras
 
 # Load Model
-model = keras.models.load_model(r'C:\Users\ngoct\Downloads\models8-20231029T030311Z-001\models8')
+model = keras.models.load_model(r'C:\Users\ngoct\Downloads\models9.h5')
 # Create ImageDataGenerator
 test_generator = keras.preprocessing.image.ImageDataGenerator(
     rescale=1./255
@@ -18,7 +18,7 @@ eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 def detect(gray, frame): 
     # We create a function that takes as input the image in black and white (gray) 
     #and the original image (frame), and that will return the same image with the detector rectangles. 
-    
+    output_predict = 0
     faces = face_cascade.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=5)
     # We apply the detectMultiScale method from the face cascade to locate one or several faces in the image.
     #scaleFactor--specifying how much the image size is reduced at each image scale
@@ -32,6 +32,7 @@ def detect(gray, frame):
         # model.predict(img_age)
         img_pedict = test_generator.flow(img_age, batch_size=32, shuffle=True) # Change image to dataframe
         output_predict = int(np.squeeze(model.predict(img_pedict)).item(0)) # Predict
+        print(output_predict)
         col = (0, 255, 0)
         cv2.putText(frame, str(output_predict), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, h/200, col ,2) # Display result
         # roi_gray = gray[y:y+h, x:x+w] # We get the region of interest in the black and white image. (range from y to y+h)
@@ -39,6 +40,6 @@ def detect(gray, frame):
         # #It's better to detect a face and take the region of interest i.e. face and find eyes in it
         # roi_color = frame[y:y+h, x:x+w] # We get the region of interest in the colored image.
         
-    return frame # We return the image with the detector rectangles.  
+    return frame, output_predict # We return the image with the detector rectangles.  
 
 # def age_predict()
