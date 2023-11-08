@@ -6,18 +6,7 @@ from datetime import datetime
 from tkinter import messagebox, filedialog
 from face_detection import detect
 import webbrowser
-age_links = {
-    "Child": "https://web.facebook.com/tuta11.07",
-    "Teenager": "https://web.facebook.com/",
-    "Adult": "https://web.facebook.com/groups/864872477456083",
-}
-def GetAgeCategory(age):
-    if age < 18:
-        return "Child"
-    elif 18 <= age < 35:
-        return "Teenager"
-    else:
-        return "Adult"
+from rcm import open_web
 # Defining CreateWidgets() function to create necessary tkinter widgets
 def createwidgets():
     root.feedlabel = Label(root, bg="steelblue", fg="white", text="WEBCAM FEED", font=('Comic Sans MS',20))
@@ -32,10 +21,10 @@ def createwidgets():
     root.browseButton = Button(root, width=10, text="BROWSE", command=destBrowse)
     root.browseButton.grid(row=3, column=2, padx=10, pady=10)
 
-    root.captureBTN = Button(root, text="CAPTURE", command=Capture, bg="LIGHTBLUE", font=('Comic Sans MS',15), width=20)
+    root.captureBTN = Button(root, text="CAPTURE", command=Capture, bg="#CDB7B5", font=('Comic Sans MS',15), width=20)
     root.captureBTN.grid(row=4, column=1, padx=10, pady=10)
 
-    root.CAMBTN = Button(root, text="STOP CAMERA", command=StopCAM, bg="LIGHTBLUE", font=('Comic Sans MS',15), width=13)
+    root.CAMBTN = Button(root, text="STOP CAMERA", command=StopCAM, bg="#CDB7B5", font=('Comic Sans MS',15), width=13)
     root.CAMBTN.grid(row=4, column=2)
 
     root.previewlabel = Label(root, bg="steelblue", fg="white", text="IMAGE PREVIEW", font=('Comic Sans MS',20))
@@ -50,7 +39,7 @@ def createwidgets():
     root.openImageButton = Button(root, width=10, text="BROWSE", command=imageBrowse)
     root.openImageButton.grid(row=3, column=5, padx=10, pady=10)
     
-    root.startPredict = Button(root, text="START PREDICT", command=StartPredict, bg="LIGHTBLUE", font=('Comic Sans MS',15), width=20)
+    root.startPredict = Button(root, text="START PREDICT", command=StartPredict, bg="#CDB7B5", font=('Comic Sans MS',15), width=20)
     root.startPredict.grid(row=4, column=5, padx=10, pady=10)
 
     # Calling ShowFeed() function
@@ -201,28 +190,16 @@ def StartPredict():
     image = cv2.imread(root.openDirectory)
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
-
     canvas, predicted_age = detect(rgb, gray)
-    if predicted_age == 0:
-        print("Age category not found.")
-        messagebox.showerror("Age category not found.")
-        return 0
     predict_image = Image.fromarray(canvas)
     predict_image = predict_image.resize((250, 250), Image.Resampling.LANCZOS)
     # Creating object of PhotoImage() class to display the frame
     predict_image = ImageTk.PhotoImage(predict_image)
-
     # Configuring the label to display the frame
     root.imageLabel.config(image=predict_image)
-
     # Keeping a reference
     root.imageLabel.photo = predict_image
-    age_category = GetAgeCategory(predicted_age)
-    suggested_link = age_links[age_category]
-    notification = f"Suggested link for {age_category}: {suggested_link}"
-    print(notification)
-    messagebox.showinfo(notification)
-    webbrowser.open(suggested_link)
+    open_web(predicted_age)
 
 
 # Creating object of tk class
@@ -240,7 +217,7 @@ root.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 root.title("Pycam")
 root.geometry("1340x700")
 root.resizable(True, True)
-root.configure(background = "sky blue")
+root.configure(background = "#B0E2FF")
 
 # Creating tkinter variables
 destPath = StringVar()

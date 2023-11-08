@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow import keras
 
 # Load Model
-model = keras.models.load_model(r"C:\Users\ngoct\Downloads\models11.h5")
+model = keras.models.load_model(r'C:\Users\ngoct\Downloads\models8-20231029T030311Z-001\models8')
 # Create ImageDataGenerator
 test_generator = keras.preprocessing.image.ImageDataGenerator(
     rescale=1./255

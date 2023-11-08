@@ -10,11 +10,11 @@ import tensorflow as tf
 from sklearn.metrics import r2_score
 
 # Load Model
-model = keras.models.load_model('C:\\Users\\ngoct\\Downloads\\models9-20231029T061513Z-001\\models9')
+model = keras.models.load_model(r'C:\Users\ngoct\Downloads\classification_age_model.hdf5')
 print('ok')
 
 # Load images from folder
-image_dir = Path('C:\\Users\\ngoct\\Downloads\\archive\\age_prediction_up\\age_prediction\\train\\034')
+image_dir = Path(r'C:\\Users\\ngoct\\Downloads\\archive\\age_prediction_up\\age_prediction\\train\\020')
 filepaths = pd.Series(list(image_dir.glob(r'*.jpg')), name='Filepath').astype(str)
 ages = pd.Series(filepaths.apply(lambda x: os.path.split(os.path.split(x)[0])[1]), name='Age').astype(int)
 images = pd.concat([filepaths, ages], axis=1).sample(frac=1.0, random_state=1).reset_index(drop=True)
@@ -36,7 +36,7 @@ test_images = train_generator.flow_from_dataframe(
     dataframe=images,
     x_col='Filepath',
     y_col='Age',
-    target_size=(120, 120),
+    target_size=(224, 224),
     color_mode='rgb',
     class_mode='raw',
     batch_size=64,
