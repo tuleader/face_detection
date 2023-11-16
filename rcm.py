@@ -17,7 +17,7 @@ def open_web(predicted_age):
     shoe_url, shirt_url, hat_url = recommend_fashion(predicted_age)
 
     root = tk.Tk()
-    root.title("Phân loại thời trang theo độ tuổi")
+    root.title("Classifying fashion by age")
 
     label_result = tk.Label(root, text=f"Hello, I wonder if you need any suggestions from us?", bg="white", font=('Comic Sans MS', 15))
     label_result.pack(padx=20, pady=20)

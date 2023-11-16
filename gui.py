@@ -4,10 +4,10 @@ from tkinter import *
 from PIL import Image,ImageTk
 from datetime import datetime
 from tkinter import messagebox, filedialog
-from face_detection import detect
+from face_detection import detect,detect2
 import webbrowser
 from rcm import open_web
-# Defining CreateWidgets() function to create necessary tkinter widgets
+
 def createwidgets():
     root.feedlabel = Label(root, bg="steelblue", fg="white", text="WEBCAM FEED", font=('Comic Sans MS',20))
     root.feedlabel.grid(row=1, column=1, padx=10, pady=10, columnspan=2)
@@ -42,7 +42,6 @@ def createwidgets():
     root.startPredict = Button(root, text="START PREDICT", command=StartPredict, bg="#CDB7B5", font=('Comic Sans MS',15), width=20)
     root.startPredict.grid(row=4, column=5, padx=10, pady=10)
 
-    # Calling ShowFeed() function
     ShowFeed()
 
 # Defining ShowFeed() function to display webcam feed in the cameraLabel;
@@ -61,7 +60,7 @@ def ShowFeed():
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
         
-        canvas, predicted_age = detect(rgb, frame)
+        canvas = detect(rgb, frame)
         # Creating an image memory from the above frame exporting array interface
         videoImg = Image.fromarray(canvas)
 
@@ -190,9 +189,9 @@ def StartPredict():
     image = cv2.imread(root.openDirectory)
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
     frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
-    canvas, predicted_age = detect(rgb, frame)
+    canvas, predicted_age = detect2(rgb, frame)
     predict_image = Image.fromarray(canvas)
-    predict_image = predict_image.resize((250, 250), Image.Resampling.LANCZOS)
+    predict_image = predict_image.resize((480, 480), Image.Resampling.LANCZOS)
     # Creating object of PhotoImage() class to display the frame
     predict_image = ImageTk.PhotoImage(predict_image)
     # Configuring the label to display the frame
