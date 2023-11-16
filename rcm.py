@@ -38,6 +38,3 @@ def open_web(predicted_age):
     root.mainloop()
 
 
-# # Example usage:
-# predicted_age = 25
-# open_web(predicted_age)

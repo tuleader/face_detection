@@ -5,7 +5,7 @@ from tensorflow import keras
 from tkinter import messagebox, filedialog
 
 # Load Model
-model = keras.models.load_model(r'C:\Users\ngoct\Downloads\final2.tf-20231113T141137Z-001\final2.tf')
+model = keras.models.load_model(r'C:\Users\ngoct\Downloads\Restnet_52.tf-20231116T114152Z-001\Restnet_52.tf')
 # Create ImageDataGenerator
 test_generator = keras.preprocessing.image.ImageDataGenerator(
     rescale=1./255
@@ -26,7 +26,8 @@ def detect(rgb, frame):
         cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 3)
 
         # Trích xuất vùng khuôn mặt, thay đổi kích thước và chuyển đổi thành mảng float32.
-        img_cat = frame[y:y+h, x:x+w] 
+        add = 0
+        img_cat = frame[y-add:y+h+add, x-add:x+w+add] 
         img_age = np.resize(img_cat, (3, 224, 224, 3))  
         img_age = img_age.astype('float32')
         # cv2.imshow("test", img_cat)
@@ -54,7 +55,8 @@ def detect2(rgb, frame):
         cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 3)
 
         # Trích xuất vùng khuôn mặt, thay đổi kích thước và chuyển đổi thành mảng float32.
-        img_cat = frame[y:y+h, x:x+w] 
+        add = 0
+        img_cat = frame[y-add:y+h+add, x-add:x+w+add]
         img_age = np.resize(img_cat, (3, 224, 224, 3))  
         img_age = img_age.astype('float32')
         # cv2.imshow("test", img_cat)

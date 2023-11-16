@@ -8,6 +8,7 @@ from face_detection import detect,detect2
 import webbrowser
 from rcm import open_web
 
+# tạo giao diện
 def createwidgets():
     root.feedlabel = Label(root, bg="steelblue", fg="white", text="WEBCAM FEED", font=('Comic Sans MS',20))
     root.feedlabel.grid(row=1, column=1, padx=10, pady=10, columnspan=2)
@@ -42,147 +43,114 @@ def createwidgets():
     root.startPredict = Button(root, text="START PREDICT", command=StartPredict, bg="#CDB7B5", font=('Comic Sans MS',15), width=20)
     root.startPredict.grid(row=4, column=5, padx=10, pady=10)
 
+    # khởi động hàm ShowFeed cùng giao diện
     ShowFeed()
 
-# Defining ShowFeed() function to display webcam feed in the cameraLabel;
 def ShowFeed():
-    # Capturing frame by frame
+    # Dùng phương thức read() của đối tượng root.cap để đọc một frame từ camera.
+    # ret là một biến boolean, nếu là True thì việc đọc frame thành công, ngược lại là False.
     ret, frame = root.cap.read()
 
     if ret:
-        # Flipping the frame vertically
+        # Sử dụng cv2.flip để lật ngược frame theo chiều ngang giúp cho ảnh không bị ngược.
         frame = cv2.flip(frame, 1)
 
-        # Displaying date and time on the feed
+        # Thêm văn bản hiển thị thời gian lên frame.
         cv2.putText(frame, datetime.now().strftime('%d/%m/%Y %H:%M:%S'), (20,30), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0,255,255))
 
-        # Changing the frame color from BGR to RGB
+        # Chuyển đổi màu từ BGR sang RGBA. Đối với OpenCV, mô hình màu thường là BGR, nhưng Pillow (PIL) sử dụng RGBA.
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
         
+        # Gọi hàm detect xử lý.
         canvas = detect(rgb, frame)
-        # Creating an image memory from the above frame exporting array interface
+
+        # Chuyển đổi frame sau khi đã được xử lý (với khuôn mặt được đánh dấu) từ mảng NumPy thành đối tượng hình ảnh Pillow.
         videoImg = Image.fromarray(canvas)
 
-        # Creating object of PhotoImage() class to display the frame
+        # Tạo đối tượng hình ảnh Tkinter từ đối tượng hình ảnh Pillow.
         imgtk = ImageTk.PhotoImage(image = videoImg)
 
-        # Configuring the label to display the frame
+        # Cập nhật ảnh root.cameraLabel để hiển thị frame đã được xử lý.
         root.cameraLabel.configure(image=imgtk)
 
-        # Keeping a reference
+        # Lưu trữ đối tượng hình ảnh Tkinter để tránh việc bị thu hồi bởi garbage collector.
         root.cameraLabel.imgtk = imgtk
 
-        # Calling the function after 10 milliseconds
+        # Sử dụng after để gọi lại chính hàm ShowFeed sau 10 miligiây, tạo ra một vòng lặp liên tục cho việc hiển thị feed từ camera.
         root.cameraLabel.after(10, ShowFeed)
     else:
-        # Configuring the label to display the frame
+        # Nếu việc đọc frame từ camera không thành công, đặt ảnh root.cameraLabel thành trống.
         root.cameraLabel.configure(image='')
     
 
 def destBrowse():
-    # Presenting user with a pop-up for directory selection. initialdir argument is optional
-    # Retrieving the user-input destination directory and storing it in destinationDirectory
-    # Setting the initialdir argument is optional. SET IT TO YOUR DIRECTORY PATH
+    # Đường dẫn được chọn với đường dẫn mặc định được set trong tham số initialdir
     destDirectory = filedialog.askdirectory(initialdir="YOUR DIRECTORY PATH")
-
-    # Displaying the directory in the directory textbox
     destPath.set(destDirectory)
 
 def imageBrowse():
-    
-    # Presenting user with a pop-up for directory selection. initialdir argument is optional
-    # Retrieving the user-input destination directory and storing it in destinationDirectory
-    # Setting the initialdir argument is optional. SET IT TO YOUR DIRECTORY PATH
+    # Mở,chọn và lưu đường dẫn ảnh
     root.openDirectory = filedialog.askopenfilename(initialdir="YOUR DIRECTORY PATH", filetypes=[("Image Files", "*.png;*.jpg")])
     
-    # Displaying the directory in the directory textbox
     imagePath.set(root.openDirectory)
-    print('test')
-    print(imagePath)
-    # Opening the saved image using the open() of Image class which takes the saved image as the argument
+
     imageView = Image.open(root.openDirectory)
     
-    # Resizing the image using Image.resize()
-    imageResize = imageView.resize((640, 480), Image.Resampling.LANCZOS)
+    imageResize = resizeImage(root.openDirectory, max_width=640, max_height=480)
 
-    # Creating object of PhotoImage() class to display the frame
     imageDisplay = ImageTk.PhotoImage(imageResize)
 
-    # Configuring the label to display the frame
     root.imageLabel.config(image=imageDisplay)
 
-    # Keeping a reference
     root.imageLabel.photo = imageDisplay
 
-# Defining Capture() to capture and save the image and display the image in the imageLabel
 def Capture():
-    # Storing the date in the mentioned format in the image_name variable
     image_name = datetime.now().strftime('%d-%m-%Y %H-%M-%S')
 
-    # If the user has selected the destination directory, then get the directory and save it in image_path
     if destPath.get() != '':
         image_path = destPath.get()
-    # If the user has not selected any destination directory, then set the image_path to default directory
+
     else:
         messagebox.showerror("ERROR", "NO DIRECTORY SELECTED TO STORE IMAGE!!")
 
-    # Concatenating the image_path with image_name and with .jpg extension and saving it in imgName variable
     imgName = image_path + '/' + image_name + ".jpg"
 
-    # Capturing the frame
     ret, frame = root.cap.read()
 
-    # Displaying date and time on the frame
     cv2.putText(frame, datetime.now().strftime('%d/%m/%Y %H:%M:%S'), (430,460), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0,255,255))
 
-    # Writing the image with the captured frame. Function returns a Boolean Value which is stored in success variable
     success = cv2.imwrite(imgName, frame)
 
-    # Opening the saved image using the open() of Image class which takes the saved image as the argument
     saved_image = Image.open(imgName)
 
-    # Creating object of PhotoImage() class to display the frame
     saved_image = ImageTk.PhotoImage(saved_image)
 
-    # Configuring the label to display the frame
     root.imageLabel.config(image=saved_image)
 
-    # Keeping a reference
     root.imageLabel.photo = saved_image
 
-    # Displaying messagebox
     if success :
         messagebox.showinfo("SUCCESS", "IMAGE CAPTURED AND SAVED IN " + imgName)
 
-
-# Defining StopCAM() to stop WEBCAM Preview
 def StopCAM():
-    # Stopping the camera using release() method of cv2.VideoCapture()
     root.cap.release()
 
-    # Configuring the CAMBTN to display accordingly
     root.CAMBTN.config(text="START CAMERA", command=StartCAM)
 
-    # Displaying text message in the camera label
     root.cameraLabel.config(text="OFF CAM", font=('Comic Sans MS',70))
 
 def StartCAM():
-    # Creating object of class VideoCapture with webcam index
     root.cap = cv2.VideoCapture(0)
 
-    # Setting width and height
     width_1, height_1 = 640, 480
     root.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width_1)
     root.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height_1)
 
-    # Configuring the CAMBTN to display accordingly
     root.CAMBTN.config(text="STOP CAMERA", command=StopCAM)
 
-    # Removing text message from the camera label
     root.cameraLabel.config(text="")
 
-    # Calling the ShowFeed() Function
     ShowFeed()
 
 def StartPredict():
@@ -192,33 +160,47 @@ def StartPredict():
     canvas, predicted_age = detect2(rgb, frame)
     predict_image = Image.fromarray(canvas)
     predict_image = predict_image.resize((480, 480), Image.Resampling.LANCZOS)
-    # Creating object of PhotoImage() class to display the frame
     predict_image = ImageTk.PhotoImage(predict_image)
-    # Configuring the label to display the frame
     root.imageLabel.config(image=predict_image)
-    # Keeping a reference
     root.imageLabel.photo = predict_image
     open_web(predicted_age)
 
+from PIL import Image
 
-# Creating object of tk class
+def resizeImage(image_path, max_width=640, max_height= 480):
+    # Mở ảnh
+    original_image = Image.open(image_path)
+    
+    # Tính toán tỉ lệ giữa chiều rộng và chiều cao
+    aspect_ratio = original_image.width / original_image.height
+    
+    # Tính toán chiều rộng mới và chiều cao mới dựa trên tỉ lệ và chiều rộng mục tiêu
+    
+    if int(max_width / aspect_ratio) < 480:
+        new_width = max_width
+        new_height = int(max_width / aspect_ratio)
+    else:
+        new_height = max_height
+        new_width = int(max_height * aspect_ratio)
+    
+    # Resize ảnh
+    resized_image = original_image.resize((new_width, new_height), Image.LANCZOS)
+    
+    return resized_image
+
 root = tk.Tk()
 
-# Creating object of class VideoCapture with webcam index
 root.cap = cv2.VideoCapture(0)
 
-# Setting width and height
 width, height = 640, 480
 root.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
 root.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
-# Setting the title, window size, background color and disabling the resizing property
 root.title("Pycam")
 root.geometry("1340x700")
 root.resizable(True, True)
 root.configure(background = "#B0E2FF")
 
-# Creating tkinter variables
 destPath = StringVar()
 imagePath = StringVar()
 
