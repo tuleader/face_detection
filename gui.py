@@ -5,9 +5,7 @@ from PIL import Image,ImageTk
 from datetime import datetime
 from tkinter import messagebox, filedialog
 from face_detection import detect,detect2
-import webbrowser
 from rcm import open_web
-
 # tạo giao diện
 def createwidgets():
     root.feedlabel = Label(root, bg="steelblue", fg="white", text="WEBCAM FEED", font=('Comic Sans MS',20))
@@ -15,12 +13,6 @@ def createwidgets():
 
     root.cameraLabel = Label(root, bg="steelblue", borderwidth=3, relief="groove")
     root.cameraLabel.grid(row=2, column=1, padx=10, pady=10, columnspan=2)
-
-    root.saveLocationEntry = Entry(root, width=55, textvariable=destPath)
-    root.saveLocationEntry.grid(row=3, column=1, padx=10, pady=10)
-
-    root.browseButton = Button(root, width=10, text="BROWSE", command=destBrowse)
-    root.browseButton.grid(row=3, column=2, padx=10, pady=10)
 
     root.captureBTN = Button(root, text="CAPTURE", command=Capture, bg="#CDB7B5", font=('Comic Sans MS',15), width=20)
     root.captureBTN.grid(row=4, column=1, padx=10, pady=10)
@@ -83,63 +75,70 @@ def ShowFeed():
         # Nếu việc đọc frame từ camera không thành công, đặt ảnh root.cameraLabel thành trống.
         root.cameraLabel.configure(image='')
     
-
-def destBrowse():
-    # Đường dẫn được chọn với đường dẫn mặc định được set trong tham số initialdir
-    destDirectory = filedialog.askdirectory(initialdir="YOUR DIRECTORY PATH")
-    destPath.set(destDirectory)
-
 def imageBrowse():
+    global imgName
     # Mở,chọn và lưu đường dẫn ảnh
-    root.openDirectory = filedialog.askopenfilename(initialdir="YOUR DIRECTORY PATH", filetypes=[("Image Files", "*.png;*.jpg")])
+    imgName = filedialog.askopenfilename(initialdir="YOUR DIRECTORY PATH", filetypes=[("Image Files", "*.png;*.jpg")])
     
-    imagePath.set(root.openDirectory)
+    # Cập nhật đường dẫn
+    imagePath.set(imgName)
 
-    imageView = Image.open(root.openDirectory)
-    
-    imageResize = resizeImage(root.openDirectory, max_width=640, max_height=480)
+    # Resize kích thước vừa với giao diện
+    imageResize = resizeImage(imgName, max_width=640, max_height=480)
 
+    # Tạo một đối tượng hình ảnh Tkinter từ đối tượng hình ảnh Pillow đã được thay đổi kích thước.
     imageDisplay = ImageTk.PhotoImage(imageResize)
 
+    # Đưa ảnh lên GUI
     root.imageLabel.config(image=imageDisplay)
-
     root.imageLabel.photo = imageDisplay
 
 def Capture():
+    # Tạo tên đường dẫn
     image_name = datetime.now().strftime('%d-%m-%Y %H-%M-%S')
 
-    if destPath.get() != '':
-        image_path = destPath.get()
+    # Khai báo biến imgName là biến toàn cục để có thể sử dụng nó trong phạm vi của hàm.
+    global imgName
+    imgName ="folder_image/" + image_name + ".jpg"
 
-    else:
-        messagebox.showerror("ERROR", "NO DIRECTORY SELECTED TO STORE IMAGE!!")
-
-    imgName = image_path + '/' + image_name + ".jpg"
-
+    # Sử dụng root.cap.read() để đọc một frame từ camera.
     ret, frame = root.cap.read()
 
+    # Thêm văn bản hiển thị thời gian lên frame để định dạng ảnh.
     cv2.putText(frame, datetime.now().strftime('%d/%m/%Y %H:%M:%S'), (430,460), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0,255,255))
 
+    # Lưu frame đã chụp thành file ảnh tại đường dẫn imgName.
     success = cv2.imwrite(imgName, frame)
 
+    # Mở ảnh vừa lưu bằng thư viện Pillow (PIL).
     saved_image = Image.open(imgName)
 
+    # Tạo một đối tượng hình ảnh Tkinter từ ảnh đã mở.
     saved_image = ImageTk.PhotoImage(saved_image)
 
+    # Cập nhật ảnh của nhãn root.imageLabel để hiển thị ảnh đã chụp.
     root.imageLabel.config(image=saved_image)
 
+    # Lưu trữ đối tượng hình ảnh Tkinter để tránh bị thu hồi bởi garbage collector.
     root.imageLabel.photo = saved_image
 
+    # Cập nhật đường dẫn
+    imagePath.set(imgName)
+
+    # Hiển thị thông báo
     if success :
         messagebox.showinfo("SUCCESS", "IMAGE CAPTURED AND SAVED IN " + imgName)
 
+# Tắt camera
 def StopCAM():
     root.cap.release()
 
     root.CAMBTN.config(text="START CAMERA", command=StartCAM)
 
-    root.cameraLabel.config(text="OFF CAM", font=('Comic Sans MS',70))
+    root.cameraLabel.config(text="OFF CAM", font=('Comic Sans MS',50))
 
+
+# Bật camera
 def StartCAM():
     root.cap = cv2.VideoCapture(0)
 
@@ -148,25 +147,40 @@ def StartCAM():
     root.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height_1)
 
     root.CAMBTN.config(text="STOP CAMERA", command=StopCAM)
-
     root.cameraLabel.config(text="")
 
     ShowFeed()
 
 def StartPredict():
-    image = cv2.imread(root.openDirectory)
+    # Khai báo biến imgName là biến toàn cục để có thể sử dụng nó trong phạm vi của hàm.
+    global imgName
+
+    # Sử dụng OpenCV để đọc ảnh từ đường dẫn imgName và lưu nó trong biến image.
+    image = cv2.imread(imgName)
+
+    # Chuyển đổi ảnh từ không gian màu BGR sang BGRA (rgb) và RGBA để sử dụng cho việc dự đoán và hiển thị.
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
     frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
+
+    # Gọi hàm detect2 để dự đoán tuổi và tạo một canvas mới để hiển thị kết quả.
     canvas, predicted_age = detect2(rgb, frame)
+
+    # Chuyển đổi mảng numpy (canvas) thành đối tượng hình ảnh của Pillow.
     predict_image = Image.fromarray(canvas)
-    predict_image = predict_image.resize((480, 480), Image.Resampling.LANCZOS)
+
+    # Tạo một đối tượng hình ảnh Tkinter từ ảnh đã resize.
     predict_image = ImageTk.PhotoImage(predict_image)
+
+    # Cập nhật ảnh của nhãn root.imageLabel để hiển thị ảnh đã dự đoán.
     root.imageLabel.config(image=predict_image)
+
+    # Lưu trữ đối tượng hình ảnh Tkinter để tránh bị thu hồi bởi garbage collector.
     root.imageLabel.photo = predict_image
+
+    # Gọi hàm đưa ra recommend về thời trang
     open_web(predicted_age)
 
-from PIL import Image
-
+# Chỉnh lại kích thước ảnh đầu vào hiển thị cho phù hợp với giao diện
 def resizeImage(image_path, max_width=640, max_height= 480):
     # Mở ảnh
     original_image = Image.open(image_path)
@@ -175,7 +189,6 @@ def resizeImage(image_path, max_width=640, max_height= 480):
     aspect_ratio = original_image.width / original_image.height
     
     # Tính toán chiều rộng mới và chiều cao mới dựa trên tỉ lệ và chiều rộng mục tiêu
-    
     if int(max_width / aspect_ratio) < 480:
         new_width = max_width
         new_height = int(max_width / aspect_ratio)
@@ -190,18 +203,22 @@ def resizeImage(image_path, max_width=640, max_height= 480):
 
 root = tk.Tk()
 
+# Kết nối với camera mặc định
 root.cap = cv2.VideoCapture(0)
 
+# Thiết lập kích thước khung hình cho camera
 width, height = 640, 480
 root.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
 root.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
 root.title("Pycam")
 root.geometry("1340x700")
+# Cho phép thay đổi kích thước cửa sổ chính theo cả chiều rộng và chiều cao.
 root.resizable(True, True)
 root.configure(background = "#B0E2FF")
 
-destPath = StringVar()
+# Khởi tạo biến imgName để lưu đường dẫn và tên file của ảnh khi được chụp.
+imgName = ""
 imagePath = StringVar()
 
 createwidgets()
