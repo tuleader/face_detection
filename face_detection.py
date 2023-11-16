@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow import keras
 
 # Load Model
-model = keras.models.load_model(r'C:\Users\ngoct\Downloads\models8-20231029T030311Z-001\models8')
+model = keras.models.load_model(r'C:\Users\ngoct\Downloads\final2.tf-20231113T141137Z-001\final2.tf')
 # Create ImageDataGenerator
 test_generator = keras.preprocessing.image.ImageDataGenerator(
     rescale=1./255
@@ -15,21 +15,24 @@ print('OK')
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 
-def detect(gray, frame): 
+def detect(rgb, frame): 
     # We create a function that takes as input the image in black and white (gray) 
     #and the original image (frame), and that will return the same image with the detector rectangles. 
     output_predict = 0
-    faces = face_cascade.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=5)
+    faces = face_cascade.detectMultiScale(rgb,scaleFactor=1.3,minNeighbors=5)
     # We apply the detectMultiScale method from the face cascade to locate one or several faces in the image.
     #scaleFactor--specifying how much the image size is reduced at each image scale
     #minNeighbors--specifying how many neighbors each candidate rectangle should have
     
     for (x, y, w, h) in faces: # For each detected face: (faces is the tuple of x,y--point of upper left corner,w-width,h-height)
         cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 3)  #frame on which rectangle will be there,top-left,bottom-right,color,thickness
-        img_cat = frame[x:y, x+w:y+h] #Create images
-        img_age = np.resize(img_cat, (3, 120, 120, 3))  #resize image
+        img_cat = frame[y:y+h, x:x+w] #Create images
+        img_age = np.resize(img_cat, (3, 224, 224, 3))  #resize image
         img_age = img_age.astype('float32')
         # model.predict(img_age)
+        cv2.imshow("test", img_cat)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         img_pedict = test_generator.flow(img_age, batch_size=32, shuffle=True) # Change image to dataframe
         output_predict = int(np.squeeze(model.predict(img_pedict)).item(0)) # Predict
         print(output_predict)

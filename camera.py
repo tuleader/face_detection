@@ -58,10 +58,10 @@ def ShowFeed():
         cv2.putText(frame, datetime.now().strftime('%d/%m/%Y %H:%M:%S'), (20,30), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0,255,255))
 
         # Changing the frame color from BGR to RGB
-        cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
         
-        canvas, predicted_age = detect(cv2image, frame)
+        canvas, predicted_age = detect(rgb, frame)
         # Creating an image memory from the above frame exporting array interface
         videoImg = Image.fromarray(canvas)
 
@@ -189,8 +189,8 @@ def StartCAM():
 def StartPredict():
     image = cv2.imread(root.openDirectory)
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
-    canvas, predicted_age = detect(rgb, gray)
+    frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
+    canvas, predicted_age = detect(rgb, frame)
     predict_image = Image.fromarray(canvas)
     predict_image = predict_image.resize((250, 250), Image.Resampling.LANCZOS)
     # Creating object of PhotoImage() class to display the frame
