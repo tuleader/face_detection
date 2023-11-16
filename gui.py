@@ -13,6 +13,7 @@ def createwidgets():
 
     root.cameraLabel = Label(root, bg="steelblue", borderwidth=3, relief="groove")
     root.cameraLabel.grid(row=2, column=1, padx=10, pady=10, columnspan=2)
+    root.cameraLabel.grid_propagate(False)
 
     root.captureBTN = Button(root, text="CAPTURE", command=Capture, bg="#CDB7B5", font=('Comic Sans MS',15), width=20)
     root.captureBTN.grid(row=4, column=1, padx=10, pady=10)
@@ -72,8 +73,12 @@ def ShowFeed():
         # Sử dụng after để gọi lại chính hàm ShowFeed sau 10 miligiây, tạo ra một vòng lặp liên tục cho việc hiển thị feed từ camera.
         root.cameraLabel.after(10, ShowFeed)
     else:
-        # Nếu việc đọc frame từ camera không thành công, đặt ảnh root.cameraLabel thành trống.
-        root.cameraLabel.configure(image='')
+        # Tạo đối tượng PhotoImage từ đường dẫn hình ảnh
+        imgtkk = PhotoImage(file='./1.png')
+        # Cập nhật ảnh root.cameraLabel để hiển thị frame đã được xử lý.
+        root.cameraLabel.configure(image=imgtkk)
+        # Lưu trữ đối tượng hình ảnh Tkinter để tránh việc bị thu hồi bởi garbage collector.
+        root.cameraLabel.imgtk = imgtkk
     
 def imageBrowse():
     global imgName
@@ -134,9 +139,6 @@ def StopCAM():
     root.cap.release()
 
     root.CAMBTN.config(text="START CAMERA", command=StartCAM)
-
-    root.cameraLabel.config(text="OFF CAM", font=('Comic Sans MS',50))
-
 
 # Bật camera
 def StartCAM():
