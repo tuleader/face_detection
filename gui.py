@@ -13,7 +13,6 @@ def createwidgets():
 
     root.cameraLabel = Label(root, bg="steelblue", borderwidth=3, relief="groove")
     root.cameraLabel.grid(row=2, column=1, padx=10, pady=10, columnspan=2)
-    root.cameraLabel.grid_propagate(False)
 
     root.captureBTN = Button(root, text="CAPTURE", command=Capture, bg="#CDB7B5", font=('Comic Sans MS',15), width=20)
     root.captureBTN.grid(row=4, column=1, padx=10, pady=10)
@@ -26,14 +25,20 @@ def createwidgets():
 
     root.imageLabel = Label(root, bg="steelblue", borderwidth=3, relief="groove")
     root.imageLabel.grid(row=2, column=4, padx=10, pady=10, columnspan=2)
+    # Tạo một đối tượng hình ảnh Tkinter từ ảnh đã mở.
+    saved_image = PhotoImage(file='./img_preview.png')
+    # Cập nhật ảnh của nhãn root.imageLabel để hiển thị ảnh đã chụp.
+    root.imageLabel.config(image=saved_image)
+    # Lưu trữ đối tượng hình ảnh Tkinter để tránh bị thu hồi bởi garbage collector.
+    root.imageLabel.photo = saved_image
 
     root.openImageEntry = Entry(root, width=55, textvariable=imagePath)
-    root.openImageEntry.grid(row=3, column=4, padx=10, pady=10)
+    root.openImageEntry.grid(row=4, column=4, padx=10, pady=10)
 
     root.openImageButton = Button(root, width=10, text="BROWSE", command=imageBrowse)
     root.openImageButton.grid(row=3, column=5, padx=10, pady=10)
     
-    root.startPredict = Button(root, text="START PREDICT", command=StartPredict, bg="#CDB7B5", font=('Comic Sans MS',15), width=20)
+    root.startPredict = Button(root, text="START PREDICT", command=StartPredict, bg="#CDB7B5", font=('Comic Sans MS',15), width=15)
     root.startPredict.grid(row=4, column=5, padx=10, pady=10)
 
     # khởi động hàm ShowFeed cùng giao diện
@@ -74,7 +79,7 @@ def ShowFeed():
         root.cameraLabel.after(10, ShowFeed)
     else:
         # Tạo đối tượng PhotoImage từ đường dẫn hình ảnh
-        imgtkk = PhotoImage(file='./1.png')
+        imgtkk = PhotoImage(file='./img_source.png')
         # Cập nhật ảnh root.cameraLabel để hiển thị frame đã được xử lý.
         root.cameraLabel.configure(image=imgtkk)
         # Lưu trữ đối tượng hình ảnh Tkinter để tránh việc bị thu hồi bởi garbage collector.
