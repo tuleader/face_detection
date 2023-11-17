@@ -26,8 +26,8 @@ def detect(rgb, frame):
         cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 3)
 
         # Trích xuất vùng khuôn mặt, thay đổi kích thước và chuyển đổi thành mảng float32.
-        add = 0
-        img_cat = frame[y-add:y+h+add, x-add:x+w+add] 
+        border = 0
+        img_cat = frame[y-border:y+h+border, x-border:x+w+border] 
         img_age = np.resize(img_cat, (3, 224, 224, 3))  
         img_age = img_age.astype('float32')
         # cv2.imshow("test", img_cat)
@@ -55,8 +55,8 @@ def detect2(rgb, frame):
         cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 3)
 
         # Trích xuất vùng khuôn mặt, thay đổi kích thước và chuyển đổi thành mảng float32.
-        add = 0
-        img_cat = frame[y-add:y+h+add, x-add:x+w+add]
+        border = 0
+        img_cat = frame[y-border:y+h+border, x-border:x+w+border]
         img_age = np.resize(img_cat, (3, 224, 224, 3))  
         img_age = img_age.astype('float32')
         # cv2.imshow("test", img_cat)

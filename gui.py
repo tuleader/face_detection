@@ -6,6 +6,7 @@ from datetime import datetime
 from tkinter import messagebox, filedialog
 from face_detection import detect,detect2
 from rcm import open_web
+import numpy as np
 # tạo giao diện
 def createwidgets():
     root.feedlabel = Label(root, bg="steelblue", fg="white", text="WEBCAM FEED", font=('Comic Sans MS',20))
@@ -21,10 +22,10 @@ def createwidgets():
     root.CAMBTN.grid(row=4, column=2)
 
     root.previewlabel = Label(root, bg="steelblue", fg="white", text="IMAGE PREVIEW", font=('Comic Sans MS',20))
-    root.previewlabel.grid(row=1, column=4, padx=10, pady=10, columnspan=2)
+    root.previewlabel.grid(row=1, column=5, padx=10, pady=10, columnspan=2)
 
-    root.imageLabel = Label(root, bg="steelblue", borderwidth=3, relief="groove")
-    root.imageLabel.grid(row=2, column=4, padx=10, pady=10, columnspan=2)
+    root.imageLabel = Label(root, bg="steelblue", borderwidth=3, relief="groove", width = 640, height = 480)
+    root.imageLabel.grid(row=2, column=5, padx=10, pady=10, columnspan=2)
     # Tạo một đối tượng hình ảnh Tkinter từ ảnh đã mở.
     saved_image = PhotoImage(file='./img_preview.png')
     # Cập nhật ảnh của nhãn root.imageLabel để hiển thị ảnh đã chụp.
@@ -32,14 +33,14 @@ def createwidgets():
     # Lưu trữ đối tượng hình ảnh Tkinter để tránh bị thu hồi bởi garbage collector.
     root.imageLabel.photo = saved_image
 
-    root.openImageEntry = Entry(root, width=55, textvariable=imagePath)
-    root.openImageEntry.grid(row=4, column=4, padx=10, pady=10)
+    root.openImageEntry = Entry(root, width=40, textvariable=imagePath)
+    root.openImageEntry.grid(row=4, column=4, padx=10, pady=10, columnspan=2)
 
     root.openImageButton = Button(root, width=10, text="BROWSE", command=imageBrowse)
-    root.openImageButton.grid(row=3, column=5, padx=10, pady=10)
+    root.openImageButton.grid(row=4, column=5, padx=10, pady=10, columnspan=2)
     
     root.startPredict = Button(root, text="START PREDICT", command=StartPredict, bg="#CDB7B5", font=('Comic Sans MS',15), width=15)
-    root.startPredict.grid(row=4, column=5, padx=10, pady=10)
+    root.startPredict.grid(row=4, column=6, padx=10, pady=10, columnspan=2)
 
     # khởi động hàm ShowFeed cùng giao diện
     ShowFeed()
@@ -163,18 +164,19 @@ def StartPredict():
     global imgName
 
     # Sử dụng OpenCV để đọc ảnh từ đường dẫn imgName và lưu nó trong biến image.
-    image = cv2.imread(imgName)
+    image = imread_utf8(imgName)
 
     # Chuyển đổi ảnh từ không gian màu BGR sang BGRA (rgb) và RGBA để sử dụng cho việc dự đoán và hiển thị.
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
     frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGBA)
-
+    
     # Gọi hàm detect2 để dự đoán tuổi và tạo một canvas mới để hiển thị kết quả.
     canvas, predicted_age = detect2(rgb, frame)
 
-    # Chuyển đổi mảng numpy (canvas) thành đối tượng hình ảnh của Pillow.
-    predict_image = Image.fromarray(canvas)
+    # Resize ảnh để hiển thị lên gui
+    predict_image = resizeImage2(canvas, max_width=640, max_height=480)
 
+    # predict_image = predict_image.resize((250, 250), Image.LANCZOS)
     # Tạo một đối tượng hình ảnh Tkinter từ ảnh đã resize.
     predict_image = ImageTk.PhotoImage(predict_image)
 
@@ -207,7 +209,37 @@ def resizeImage(image_path, max_width=640, max_height= 480):
     resized_image = original_image.resize((new_width, new_height), Image.LANCZOS)
     
     return resized_image
+def resizeImage2(canvas, max_width=640, max_height=480):
+    # Chuyển đổi mảng numpy (canvas) thành đối tượng hình ảnh của Pillow.
+    predict_image = Image.fromarray(canvas)
 
+    # Tính toán tỉ lệ giữa chiều rộng và chiều cao
+    aspect_ratio = predict_image.width / predict_image.height
+
+    # Tính toán chiều rộng mới và chiều cao mới dựa trên tỉ lệ và chiều rộng mục tiêu
+    if int(max_width / aspect_ratio) < max_height:
+        new_width = max_width
+        new_height = int(max_width / aspect_ratio)
+    else:
+        new_height = max_height
+        new_width = int(max_height * aspect_ratio)
+
+    # Resize ảnh
+    resized_image = predict_image.resize((new_width, new_height), Image.LANCZOS)
+    
+    return resized_image
+def imread_utf8(path):
+    # Đọc dữ liệu từ tệp tin
+    with open(path, 'rb') as f:
+        image_data = bytearray(f.read())
+
+    # Chuyển đổi dữ liệu thành mảng numpy
+    nparr = np.frombuffer(image_data, np.uint8)
+
+    # Giải mã ảnh từ mảng numpy
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    
+    return img
 root = tk.Tk()
 
 # Kết nối với camera mặc định
