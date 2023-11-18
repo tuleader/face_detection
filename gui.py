@@ -251,7 +251,7 @@ root.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
 root.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
 root.title("Pycam")
-root.geometry("1340x700")
+root.geometry("1340x650")
 # Cho phép thay đổi kích thước cửa sổ chính theo cả chiều rộng và chiều cao.
 root.resizable(True, True)
 root.configure(background = "#B0E2FF")
