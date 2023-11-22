@@ -6,6 +6,6 @@
 - Khởi động môi trường ảo: source python_env/Scripts/activate
 - Cài đặt các thư viện: pip install -r requirements.txt
 4. Mở project bằng vscode
-5. Dùng lệnh cmd để vào môi trường ảo vừa tạo
-6. Sửa đường dẫn Model trong file face_detection.py
+5. Sửa đường dẫn Model trong file face_detection.py
+6. Dùng lệnh cmd để vào môi trường ảo vừa tạo
 7. Chạy python gui.py để mở app
