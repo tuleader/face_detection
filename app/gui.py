@@ -28,7 +28,7 @@ def createwidgets():
     root.imageLabel = Label(root, bg="steelblue", borderwidth=3, relief="groove", width = 640, height = 480)
     root.imageLabel.grid(row=2, column=5, padx=10, pady=10, columnspan=2)
     # Tạo một đối tượng hình ảnh Tkinter từ ảnh đã mở.
-    saved_image = PhotoImage(file='./img_preview.png')
+    saved_image = PhotoImage(file='image_default/img_preview.png')
     # Cập nhật ảnh của nhãn root.imageLabel để hiển thị ảnh đã chụp.
     root.imageLabel.config(image=saved_image)
     # Lưu trữ đối tượng hình ảnh Tkinter để tránh bị thu hồi bởi garbage collector.
@@ -81,7 +81,7 @@ def ShowFeed():
         root.cameraLabel.after(10, ShowFeed)
     else:
         # Tạo đối tượng PhotoImage từ đường dẫn hình ảnh
-        imgtkk = PhotoImage(file='./img_source.png')
+        imgtkk = PhotoImage(file='image_default/img_source.png')
         # Cập nhật ảnh root.cameraLabel để hiển thị frame đã được xử lý.
         root.cameraLabel.configure(image=imgtkk)
         # Lưu trữ đối tượng hình ảnh Tkinter để tránh việc bị thu hồi bởi garbage collector.
