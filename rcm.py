@@ -60,12 +60,15 @@ def open_web(predicted_age):
         for i in range(1, 6):
             tk.Radiobutton(rating_frame, text=f"{i} Stars", variable=rating_var, value=i, font=('Comic Sans MS', 12),
                            command=lambda i=i: update_rating(i)).pack(side='left')
-
+        def update_feedback(value):
+            feedback_var.set(value)
         # Ô nhập nội dung đánh giá
         tk.Label(rating_window, text="Your feedback:", font=('Comic Sans MS', 15)).pack(padx=20, pady=10)
         feedback_var = tk.StringVar()
-        entry_feedback = tk.Entry(rating_window, textvariable=feedback_var, font=('Comic Sans MS', 15), width=50)
+        entry_feedback = tk.Entry(rating_window, textvariable=feedback_var, font=('Times New Roman', 15), width=50)
         entry_feedback.pack(padx=20, pady=10)
+        # Add an event binding to update feedback_var when the user types
+        entry_feedback.bind("<KeyRelease>", lambda event: update_feedback(entry_feedback.get()))
         def submit_rating():
             rating = rating_var.get()
             feedback = feedback_var.get()
@@ -76,8 +79,8 @@ def open_web(predicted_age):
                 "feedback": feedback
             }
 
-            with open("ratings.txt", "a") as f:
-                json.dump(data, f)
+            with open("ratings.txt", "a", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False)
                 f.write("\n")
             rating_window.destroy()
 

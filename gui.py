@@ -7,6 +7,7 @@ from tkinter import messagebox, filedialog
 from face_detection import detect,detect2
 from rcm import open_web
 import numpy as np
+import os
 # tạo giao diện
 def createwidgets():
     root.feedlabel = Label(root, bg="steelblue", fg="white", text="WEBCAM FEED", font=('Comic Sans MS',20))
@@ -107,6 +108,11 @@ def imageBrowse():
 def Capture():
     # Tạo tên đường dẫn
     image_name = datetime.now().strftime('%d-%m-%Y %H-%M-%S')
+
+    # Kiểm tra và tạo thư mục nếu chưa tồn tại
+    folder_path = "folder_image"
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
 
     # Khai báo biến imgName là biến toàn cục để có thể sử dụng nó trong phạm vi của hàm.
     global imgName
