@@ -5,7 +5,7 @@ from tensorflow import keras
 from tkinter import messagebox, filedialog
 
 # Load Model
-model = keras.models.load_model(r'C:\Users\ngoct\Downloads\Restnet_52.tf\Restnet_52.tf')
+model = keras.models.load_model('train\Restnet_52.tf') #Thay đường dẫn file train
 # Create ImageDataGenerator
 test_generator = keras.preprocessing.image.ImageDataGenerator(
     rescale=1./255
