@@ -59,8 +59,15 @@ def open_web(predicted_age):
             rating_var.set(value)
 
         for i in range(1, 6):
-            tk.Radiobutton(rating_frame, text=f"{i} Stars", variable=rating_var, value=i, font=('Comic Sans MS', 12),
-                           command=lambda i=i: update_rating(i)).pack(side='left')
+            tk.Radiobutton(
+                rating_frame,
+                text=f"{i} Stars",
+                variable=rating_var,
+                value=i,
+                font=('Comic Sans MS', 12),
+                command=lambda i=i: update_rating(i)
+            ).pack(side='left')
+
         def update_feedback(value):
             feedback_var.set(value)
         # Ô nhập nội dung đánh giá
