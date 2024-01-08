@@ -2,6 +2,7 @@ import tkinter as tk
 import webbrowser
 import json
 import datetime
+import os
 def recommend_fashion(predicted_age):
     if predicted_age < 13:
         return "https://shopee.vn/bitas_store?shopCollection=120740926#product_list","https://shopee.vn/obeahvn?shopCollection=158829356#product_list",'https://shopee.vn/benty.vn?shopCollection=246246813#product_list'
@@ -79,9 +80,14 @@ def open_web(predicted_age):
                 "feedback": feedback
             }
 
-            with open("ratings.txt", "a", encoding="utf-8") as f:
+            feedback_dir = "feedback"
+            if not os.path.exists(feedback_dir):
+                os.makedirs(feedback_dir)
+
+            with open(os.path.join(feedback_dir, "ratings.txt"), "a", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False)
                 f.write("\n")
+            
             rating_window.destroy()
 
         submit_button = tk.Button(rating_window, text="Submit", command=submit_rating, font=('Comic Sans MS', 15))
