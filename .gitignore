@@ -1,4 +1,6 @@
 app/__pycache__
 train/Restnet_52.tf
+train/datatrain
+train/model/__pycache__
 /folder_image
 /feedback
