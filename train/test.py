@@ -8,13 +8,13 @@ import tensorflow as tf
 from sklearn.metrics import r2_score
 
 def main():
-    image_dir = Path(r'/content/aglined faces/50')
+    image_dir = Path(r'') #Đường dẫn tới file test
     filepaths = pd.Series(list(image_dir.glob(r'*.jpg')), name='Filepath').astype(str)
     ages = pd.Series(filepaths.apply(lambda x: os.path.split(os.path.split(x)[0])[1]), name='Age').astype(int)
     images = pd.concat([filepaths, ages], axis=1).sample(frac=1.0, random_state=1).reset_index(drop=True)
 
     # Load Model
-    model = tf.keras.models.load_model(r'/content/Restnet_52.tf')
+    model = tf.keras.models.load_model(r'C:\Users\ngoct\OneDrive\Desktop\face_detection\train\Restnet_52.tf') #đường dẫn tới tập đã train
     print('ok')
     model.summary()
     # Create ImageDataGenerator
