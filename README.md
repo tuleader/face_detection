@@ -8,4 +8,4 @@
 4. Mở project bằng vscode
 5. Sửa đường dẫn Model trong file face_detection.py
 6. Dùng lệnh cmd để vào môi trường ảo vừa tạo
-7. Chạy python gui.py để mở app
+7. Chạy python app/gui.py để mở app
